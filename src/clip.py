@@ -15,6 +15,8 @@ class clip(sound.sound):
 	self.channels = self.get_n_channels()
 	self.length = self.get_length_s()
 	self.amp = 1.0
+	self.start_sample = 0
+	self.end_sample = self.start_sample + self.length * self.sr
 
     def __repr__(self):
 	return "<CLIP: Name: %s, Channels %s, Sample Rate: %s, Length %s seconds>" % (self.name, self.channels, self.sr, self.length)

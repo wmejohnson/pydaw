@@ -12,17 +12,22 @@ class track(sound.sound):
     def __init__(self, name, length, sr):
 	self.name = name
 	self.length = length
-	self.volume = 1.0
-	self.clips = []
-	self.pan = 0.5
 	self.sr = sr
-	self.data = numpy.zeros(length*sr) 
+	self.clips = numpy.array([])
+	self.data = numpy.zeros(self.length * self.sr)
+	self.pan = 0.5
+	self.volume = 1.0
 	
-    def add_clip(self, clip, start_point):
+    def __repr__(self):
+	return "<TRACK: Name: %s, Volume: %s>" % (self.name, self.volume)
+
+    def add_clip(self, clip, start_second):
 	#add a sound at time index
-	start_sample = self.sr/start_point
-	end_sample = start_sample + (sound.length*self.sr)
-	self.clips.append([sound, start_sample, end_sample])
+	start_sample = self.sr*start_second
+	end_sample = start_sample + (clip.length*self.sr)
+	clip.start_sample = start_sample
+	clip.end_sample = end_sample
+	self.clips = numpy.append(self.clips, [clip])
 	
     def remove_clip(self, clip_array_index):
 	#remove a sound at array index 
@@ -32,8 +37,9 @@ class track(sound.sound):
 	self.data = numpy.zeros(self.length*self.sr)
 
     def render(self):
-	for t in self.clips:
-	    self.data[1:2] = sound.data
+	for clip in self.clips:
+	    self.data[clip.start_sample:clip.end_sample] = clip.data
+	self.data *= self.volume
 	scipy.io.wavfile.write("../temp/"+self.name+".wav", self.sr, self.data)
 
     def play(self):

@@ -44,6 +44,12 @@ class sound:
 	numpy.fliplr(ramp)
 	self.data[-len_samp:] = ramp
 
+    def reverse(self):
+	self.data = self.data[::-1]    
+
+    def reversed(self):
+	return self.data[::-1]
+
     def play(self):
 	self.render()
 	os.system("paplay ../temp/"+self.name+".wav") 
