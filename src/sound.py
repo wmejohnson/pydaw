@@ -18,15 +18,32 @@ class sound:
 	return "<SOUND: Name: %s, Channels %s, Sample Rate: %s, Length: %s seconds>" % (self.name, self.channels, self.sr, self.length) 
     
     def get_length_s(self):
-	return len(self.data)/self.sr
+	return len(self.data)/float(self.sr)
 
-    def normalized(self):
+    def normalized(self, ceiling=0.9):
 	max_sample = numpy.max(abs(self.data))
-	scalar = 1/float(max_sample)
+	scalar = ceiling/float(max_sample)
 	data = self.data.astype(float)
 	data *= scalar
 	return data
+
+    def normalize(self, ceiling=0.9):
+	max_sample = numpy.max(abs(self.data))
+	scalar = ceiling/float(max_sample)
+	data = self.data.astype(float)
+	data *= scalar
+	self.data = data    
  
+    def fade_in(self, len_sec):
+	len_samp = len_sec *self.sr
+	self.data[:len_samp] = numpy.arange(len_samp, self.data[len_samp]/len_samp)
+
+    def fade_out(self, len_sec):
+	len_samp = len_sec *self.sr
+	ramp = numpy.arange(len_samp, self.data[:-len_samp]/len_samp)
+	numpy.fliplr(ramp)
+	self.data[-len_samp:] = ramp
+
     def play(self):
 	self.render()
 	os.system("paplay ../temp/"+self.name+".wav") 
